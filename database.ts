@@ -1,5 +1,4 @@
 import * as mc from '@minecraft/server'
-
 export class Database {
     /**
      * The map of key-value pairs
