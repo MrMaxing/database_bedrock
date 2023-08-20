@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "lib": [
+            "dom",
+            "es6",
+            "es2015",
+            "es2016",
+            "es2017",
+            "es2017.string",
+            "es2021"
+        ],
+        "moduleResolution": "node",
+        "module": "ESNext",
+        "outDir": "./",
+        "rootDir": "./",
+        "sourceMap": false
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
