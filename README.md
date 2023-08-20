@@ -54,12 +54,3 @@ database.clear();
 | `forEach(callback: (key: Key, value: Value) => void): void` | Executes a callback function for each key-value pair in the database. |
 | `map(callback: (key: Key, value: Value) => [Key, Value]): Array<[Key, Value]>` | Maps the database using a callback function and returns the result.   |
 | `filter(callback: (key: Key, value: Value) => boolean): Array<[Key, Value]>` | Filters the database using a callback function and returns the result. |
-| `find(callback: (key: Key, value: Value) => boolean): { key: Key; value: Value; } \| undefined` | Finds a key-value pair in the database based on a condition.         |
-
-
-# Creidt
-
-Addon Create by Mr Maxing 
-[Youtube](https://www.youtube.com/@MrMaxing)
-[Github](https://github.com/MrMaxing)<br>
-Thank you for choosing the Transfer Money add-on! We hope you enjoy using the fun money transfer ui 💫👏
