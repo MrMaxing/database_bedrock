@@ -1,6 +1,11 @@
 import * as mc from '@minecraft/server'
 
-export class Database<Key, Value> {
+export class Database {
+    /**
+     * The map of key-value pairs
+     * @type {Map<string, string>} The map of key-value pairs
+     */
+    private DATABASE_MAP: Map<string, string> = new Map()
     /**
      * The name of the database (scoreboard objective)
      * @type {string} The name of the database
@@ -19,10 +24,39 @@ export class Database<Key, Value> {
      */
     constructor(databaseName: string) {
         if (databaseName.length < 1)
-            throw new Error('Database name must be at least 1 character long');
-        this.DATABASE_NAME = databaseName;
-        this.DISPLAY_NAME = `Database:${databaseName}`;
-        try { mc.world.scoreboard.addObjective(this.DATABASE_NAME, this.DISPLAY_NAME) } catch { }
+            throw new Error('Database name must be at least 1 character long')
+        this.DATABASE_NAME = databaseName
+        this.DISPLAY_NAME = `Database:${databaseName}`
+        this.start()
+    }
+    /**
+     * Starts the database
+     * Adds all key-value pairs to the map
+     * @returns {void}
+     */
+    private start(): void {
+        try {
+            mc.world.scoreboard.addObjective(this.DATABASE_NAME, this.DISPLAY_NAME)
+        } catch { }
+        mc.world.scoreboard.getObjective(this.DATABASE_NAME).getParticipants().forEach(data => {
+            if (data.displayName.startsWith('Database:')) {
+                const [key, value] = JSON.parse(this.base36ToValue(data.displayName.split(':')[1]))
+                this.DATABASE_MAP.set(key, value)
+            }
+        })
+    }
+    /**
+     * Saves the database
+     * Removes the scoreboard objective and adds it again
+     * @returns {void}
+     */
+    private save(): void {
+        mc.world.scoreboard.removeObjective(this.DATABASE_NAME)
+        mc.world.scoreboard.addObjective(this.DATABASE_NAME, this.DISPLAY_NAME)
+        this.DATABASE_MAP.forEach((value, key) => {
+            const database = this.valueToBase36(JSON.stringify([key, value]))
+            this.runCommand(`scoreboard players set "Database:${database}" "${this.DATABASE_NAME}" 0`)
+        })
     }
     /**
      * Converts a string to base 36
@@ -51,36 +85,22 @@ export class Database<Key, Value> {
     }
     /**
      * Gets the database
-     * @returns {Array<{key: Key, value: Value}>} The database
+     * @returns {Array<{key: string, value: string}>} The database
      */
-    public getDatabase(): Array<{ key: Key; value: Value; }> {
-        return mc.world.scoreboard.getObjective(this.DATABASE_NAME).getParticipants().map(data => {
-            if (data.displayName.startsWith('Database:')) {
-                const [key, value] = JSON.parse(this.base36ToValue(data.displayName.split(':')[1]));
-                return { key, value }
-            }
-        }).filter((data): data is { key: Key; value: Value; } => data instanceof Object)
+    public getDatabase(): Array<{ key: string; value: string }> {
+        const data = Object.fromEntries(this.DATABASE_MAP)
+        return Object.entries(data).map(([key, value]) => ({ key, value }))
     }
     /**
      * Sets a key-value pair
-     * @param {Key} key The key
-     * @param {Value} value The value
+     * @param {string} key The key
+     * @param {string} value The value
      * @returns {void}
      * @example this.set('key', 'value')
      */
-    public set(key: Key, value: Value): void {
-        const database = this.valueToBase36(JSON.stringify([key, value]));
-        this.runCommand(`scoreboard players set "Database:${database}" "${this.DATABASE_NAME}" 0`);
-    }
-    /**
-     * Deletes a key-value pair
-     * @param {Key} key The key
-     * @returns {void}
-     * @example this.delete('key')
-     */
-    public delete(key: Key): void {
-        const database = this.valueToBase36(JSON.stringify([key, this.get(key)]));
-        this.runCommand(`scoreboard players reset "Database:${database}" "${this.DATABASE_NAME}"`);
+    public set(key: string, value: string): void {
+        this.DATABASE_MAP.set(key, value)
+        this.save()
     }
     /**
      * Clears the database
@@ -88,87 +108,98 @@ export class Database<Key, Value> {
      * @example this.clear()
      */
     public clear(): void {
-        this.getDatabase().forEach(({ key }) => this.delete(key))
+        this.DATABASE_MAP.clear()
+        this.save()
     }
     /**
-     * Replaces a key-value pair
-     * @param {Key} key The key
-     * @param {Value} value The value
+     * Deletes a key-value pair
+     * @param {string} key The key
+     * @returns {void}
+     * @example this.delete('key')
+     */
+    public delete(key: string): void {
+        this.DATABASE_MAP.delete(key)
+        this.save()
+    }
+    /**
+     * Finds a key-value pair
+     * @param {string} key The key
+     * @param {string} value The value
      * @returns {void}
      */
-    public replace(key: Key, value: Value): void {
+    public replace(key: string, value: string): void {
         this.delete(key)
         this.set(key, value)
+        this.save()
     }
     /**
-     * Gets a value from the database
-     * @param {Key} key The key
-     * @returns {Value | undefined} The value
+     * Gets a value from a key
+     * @param key The key
+     * @returns {string | undefined} The value
      * @example this.get('key')
      */
-    public get(key: Key): Value | undefined {
-        return this.getDatabase().find(({ key: databaseKey }) => key === databaseKey)?.value
+    public get(key: string): string | undefined {
+        return this.DATABASE_MAP.get(key)
     }
     /**
-     * Checks if a key exists in the database
-     * @param {Key} key The key
-     * @returns {boolean} Whether the key exists in the database
+     * Checks if the database has a key
+     * @param {string} key The key
+     * @returns {boolean} Whether the database has the key
      * @example this.has('key')
      */
-    public has(key: Key): boolean {
-        return Boolean(this.get(key))
+    public has(key: string): boolean {
+        return this.DATABASE_MAP.has(key)
     }
     /**
      * Gets the size of the database
      * @returns {number} The size of the database
      */
     public size(): number {
-        return this.getDatabase().length
+        return this.DATABASE_MAP.size
+    }
+    /**
+     * Gets the entries of the database
+     * @returns {IterableIterator<[string, string]>} The entries of the database
+     */
+    public entries(): IterableIterator<[string, string]> {
+        return this.DATABASE_MAP.entries()
     }
     /**
      * Gets the keys of the database
-     * @returns {Key[]} The keys of the database
+     * @returns {string[]} The keys of the database
      */
-    public keys(): Key[] {
+    public keys(): string[] {
         return this.getDatabase().map(({ key }) => key)
     }
     /**
      * Gets the values of the database
-     * @returns {Value[]} The values of the database
+     * @returns {string[]} The values of the database
      */
-    public values(): Value[] {
+    public values(): string[] {
         return this.getDatabase().map(({ value }) => value)
     }
     /**
-     * Maps the database
-     * @param callback The callback
-     * @returns {Array<{key: Key, value: Value}>} The mapped database
-     */
-    public map<Data>(callback: (Data: { key: Key; value: Value }) => Data): Data[] {
-        return this.getDatabase().map(({ key, value }) => callback({ key, value }))
-    }
-    /**
      * Executes a callback for each key-value pair
-     * @param callback The callback
+     * @param {Function} callback The callback
      * @returns {void}
      */
-    public forEach(callback: (key: Key, value: Value) => void): void {
-        this.getDatabase().forEach(({ key, value }) => callback(key, value))
+    public forEach(callback: (key: string, value: string) => void): void {
+        this.DATABASE_MAP.forEach(callback)
+    }
+    /**
+     * Maps the database
+     * @param {Function} callback The callback
+     * @returns {Array<[string, string]>} The mapped database
+     */
+    public map(callback: (key: string, value: string) => [string, string]): Array<[string, string]> {
+        return this.getDatabase().map(({ key, value }) => callback(key, value))
     }
     /**
      * Filters the database
      * @param callback The callback
-     * @returns {Array<{key: Key, value: Value}>} The filtered database
+     * @returns {Array<[string, string]>} The filtered database
      */
-    public filter(callback: (key: Key, value: Value) => boolean): Array<{ key: Key; value: Value; }> {
-        return this.getDatabase().filter(({ key, value }) => callback(key, value))
-    }
-    /**
-     * Finds a key-value pair
-     * @param callback The callback
-     * @returns {{key: Key, value: Value} | undefined} The key-value pair
-     */
-    public find(callback: (key: Key, value: Value) => boolean): { key: Key; value: Value; } | undefined {
-        return this.getDatabase().find(({ key, value }) => callback(key, value))
+    public filter(callback: (key: string, value: string) => boolean): Array<[string, string]> {
+        return this.getDatabase().filter(({ key, value }) => callback(key, value)).map(({ key, value }) => [key, value])
     }
 }
