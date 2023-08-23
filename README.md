@@ -1,4 +1,4 @@
-# MC Database 0.1.0
+# mc database 0.1.0
 This class provides a convenient way to store and retrieve key-value pairs in Minecraft using the scoreboard objective. It allows you to set, get, delete, and replace key-value pairs, as well as perform various operations on the database such as clearing, checking for key existence, and retrieving the size, keys, and values.
 
 ## Usage
