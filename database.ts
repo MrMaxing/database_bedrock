@@ -38,7 +38,7 @@ export class Database {
             mc.world.scoreboard.addObjective(this.DATABASE_NAME, this.DISPLAY_NAME)
         } catch { }
         mc.world.scoreboard.getObjective(this.DATABASE_NAME).getParticipants().forEach(data => {
-            if (data.displayName.startsWith('Database:')) {
+            if (data.displayName.startsWith('db:')) {
                 const [key, value] = JSON.parse(this.base36ToValue(data.displayName.split(':')[1]))
                 this.DATABASE_MAP.set(key, value)
             }
@@ -54,7 +54,7 @@ export class Database {
         mc.world.scoreboard.addObjective(this.DATABASE_NAME, this.DISPLAY_NAME)
         this.DATABASE_MAP.forEach((value, key) => {
             const database = this.valueToBase36(JSON.stringify([key, value]))
-            this.runCommand(`scoreboard players set "Database:${database}" "${this.DATABASE_NAME}" 0`)
+            this.runCommand(`scoreboard players set "db:${database}" "${this.DATABASE_NAME}" 0`)
         })
     }
     /**
