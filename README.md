@@ -1,5 +1,9 @@
-# DynamicProperties Class
-The DynamicProperties class is a TypeScript class that provides dynamic property management. It allows you to store and manage properties with keys and values of various types, such as strings, numbers, booleans, and objects. The class also provides methods for interacting with these properties.
+# DynamicProperties Class for Minecraft Bedrock Edition
+The DynamicProperties class is a TypeScript and JavaScript class that provides dynamic property management. It allows you to store and manage properties with keys and values of various types, such as strings, numbers, booleans, and objects. The class also provides methods for interacting with these properties.
+
+* Version: 1.0.0
+* Updated: 2021-10-17
+* Min Version: 1.20.40
 
 ## Installation
 To use the DynamicProperties class, you need to have the Minecraft server API (@minecraft/server) installed in your project. If you haven't installed it yet, you can add it to your project using npm:
