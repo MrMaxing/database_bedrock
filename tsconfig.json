@@ -12,8 +12,8 @@
         ],
         "moduleResolution": "node",
         "module": "ESNext",
-        "outDir": "./",
-        "rootDir": "./",
+        "outDir": "./src",
+        "rootDir": "./src",
         "sourceMap": false
     },
     "exclude": [

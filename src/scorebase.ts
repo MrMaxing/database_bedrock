@@ -1,20 +1,25 @@
 import * as mc from '@minecraft/server'
+
 export class Database {
+
     /**
      * The map of key-value pairs
      * @type {Map<string, string>} The map of key-value pairs
      */
     private DATABASE_MAP: Map<string, string> = new Map()
+
     /**
      * The name of the database (scoreboard objective)
      * @type {string} The name of the database
      */
     private DATABASE_NAME: string
+
     /**
      * The display name of the scoreboard objective
      * @type {string} The display name of the scoreboard objective
      */
     private DISPLAY_NAME: string
+
     /**
      * Creates a new database instance with the given name and optional display name
      * @param databaseName The name of the database
@@ -28,6 +33,7 @@ export class Database {
         this.DISPLAY_NAME = `Database:${databaseName}`
         this.start()
     }
+
     /**
      * Starts the database
      * Adds all key-value pairs to the map
@@ -44,6 +50,7 @@ export class Database {
             }
         })
     }
+
     /**
      * Saves the database
      * Removes the scoreboard objective and adds it again
@@ -57,6 +64,7 @@ export class Database {
             this.runCommand(`scoreboard players set "db:${database}" "${this.DATABASE_NAME}" 0`)
         })
     }
+
     /**
      * Converts a string to base 36
      * @param {string} value The string to convert
@@ -65,6 +73,7 @@ export class Database {
     private valueToBase36(value: string): string {
         return value.split('').map(value => value.charCodeAt(0).toString(32)).join(' ');
     }
+
     /**
      * Converts a base 36 string to a string
      * @param {string} base36 The base 36 string to convert
@@ -73,6 +82,7 @@ export class Database {
     private base36ToValue(base36: string): string {
         return base36.split(' ').map(value => String.fromCharCode(parseInt(value, 32))).join('');
     }
+
     /** 
      * Runs a command
      * @param {string} command The command to run
@@ -82,6 +92,7 @@ export class Database {
     private runCommand(command: string): void {
         mc.world.getDimension('overworld').runCommandAsync(command)
     }
+
     /**
      * Gets the database
      * @returns {Array<{key: string, value: string}>} The database
@@ -90,6 +101,7 @@ export class Database {
         const data = Object.fromEntries(this.DATABASE_MAP)
         return Object.entries(data).map(([key, value]) => ({ key, value }))
     }
+
     /**
      * Sets a key-value pair
      * @param {string} key The key
@@ -101,6 +113,7 @@ export class Database {
         this.DATABASE_MAP.set(key, value)
         this.save()
     }
+
     /**
      * Clears the database
      * @returns {void}
@@ -110,6 +123,7 @@ export class Database {
         this.DATABASE_MAP.clear()
         this.save()
     }
+
     /**
      * Deletes a key-value pair
      * @param {string} key The key
@@ -120,6 +134,7 @@ export class Database {
         this.DATABASE_MAP.delete(key)
         this.save()
     }
+
     /**
      * Finds a key-value pair
      * @param {string} key The key
@@ -131,6 +146,7 @@ export class Database {
         this.set(key, value)
         this.save()
     }
+
     /**
      * Gets a value from a key
      * @param key The key
@@ -140,6 +156,7 @@ export class Database {
     public get(key: string): string | undefined {
         return this.DATABASE_MAP.get(key)
     }
+
     /**
      * Checks if the database has a key
      * @param {string} key The key
@@ -149,6 +166,7 @@ export class Database {
     public has(key: string): boolean {
         return this.DATABASE_MAP.has(key)
     }
+    
     /**
      * Gets the size of the database
      * @returns {number} The size of the database
@@ -156,6 +174,7 @@ export class Database {
     public size(): number {
         return this.DATABASE_MAP.size
     }
+
     /**
      * Gets the entries of the database
      * @returns {IterableIterator<[string, string]>} The entries of the database
@@ -163,6 +182,7 @@ export class Database {
     public entries(): IterableIterator<[string, string]> {
         return this.DATABASE_MAP.entries()
     }
+
     /**
      * Gets the keys of the database
      * @returns {string[]} The keys of the database
@@ -170,6 +190,7 @@ export class Database {
     public keys(): string[] {
         return this.getDatabase().map(({ key }) => key)
     }
+
     /**
      * Gets the values of the database
      * @returns {string[]} The values of the database
@@ -177,6 +198,7 @@ export class Database {
     public values(): string[] {
         return this.getDatabase().map(({ value }) => value)
     }
+
     /**
      * Executes a callback for each key-value pair
      * @param {Function} callback The callback
@@ -185,6 +207,7 @@ export class Database {
     public forEach(callback: (key: string, value: string) => void): void {
         this.DATABASE_MAP.forEach(callback)
     }
+
     /**
      * Maps the database
      * @param {Function} callback The callback
@@ -193,6 +216,7 @@ export class Database {
     public map(callback: (key: string, value: string) => [string, string]): Array<[string, string]> {
         return this.getDatabase().map(({ key, value }) => callback(key, value))
     }
+
     /**
      * Filters the database
      * @param callback The callback
