@@ -6,10 +6,10 @@ The DynamicProperties class is a TypeScript and JavaScript class that provides d
 * Min Version: 1.20.40
 
 ## Installation
-To use the DynamicProperties class, you need to have the Minecraft server API (@minecraft/server) installed in your project. If you haven't installed it yet, you can add it to your project using npm:
+To use the DynamicProperties class, you need to have the Minecraft server API (@minecraft/server) installed in your project. If you haven't installed it yet, you can add it to your project using git:
 
 ```shell
-npm install @minecraft/server
+gh repo clone MrMaxing/database_bedrock
 ```
 ## Usage
 You can use the DynamicProperties class to create and manage dynamic properties with the following methods:
