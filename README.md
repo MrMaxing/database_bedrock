@@ -74,7 +74,7 @@ entries(): IterableIterator<[string, Value]>
 * Returns an iterable containing key-value pairs (entries) of the dynamic properties.
 ### `map` Method
 ```js
-map(callback: (value: [string, Value], index: number, array: [string, Value][]) => Value, thisArg?: any): Value[]
+map<T>(callback: (value: [string, Value], index: number, array: [string, Value][]) => T, thisArg?: any): T[]
 ```
 * Applies a callback function to each entry and returns an array of results.
 * Optionally, you can specify a thisArg to be used as the this value when executing the callback function.
