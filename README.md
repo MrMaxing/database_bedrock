@@ -11,7 +11,7 @@ To use the DynamicProperties class, you need to have the Minecraft server API (@
 ```shell
 gh repo clone MrMaxing/database_bedrock
 ```
-## Usage
+## Methods
 You can use the DynamicProperties class to create and manage dynamic properties with the following methods:
 
 ### Constructor
